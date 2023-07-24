@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neptune's Pride Combat Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg-color: #262626;
+            --secondary-bg-color: #2c2c2c;
+            --text-color: #ddd;
+            --input-bg-color: #3a3a3a;
+            --border-color: #444;
+            --button-color: #007BFF;
+            --button-hover-color: #0056b3;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            padding: 8px;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        input:focus,
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 3px var(--text-color);
+        }
+
+        button {
+            margin: 10px 0;
+            padding: 10px 15px;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+
+        fieldset {
+            margin: 20px 0;
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        legend {
+            color: #fff;
+            font-weight: bold;
+            background-color: var(--secondary-bg-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        #combatLog {
+            font-weight: normal;
+            text-align: left;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 500px;
+            overflow-y: auto;
+            max-height: 200px;
+            background-color: var(--input-bg-color);
+            animation: fadeInOut 0.3s;
+        }
+
+        #combatLogModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--secondary-bg-color);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        #combatLogContainer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #combatLogBtn {
+            padding: 10px 15px;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        #combatLogBtn:hover {
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+        }
+
+        #combatLog {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #battleSummary {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #32CD32;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            fieldset {
+                max-width: 100%;
+            }
+        }
+
+        /* Error Message Styles */
+        .error {
+            color: red;
+            font-size: 0.8em;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Neptune's Pride Combat Calculator</h1>
+
+    <fieldset>
+        <legend>Defender</legend>
+        <label for="defenderShips">Ships:
+            <input type="number" id="defenderShips" placeholder="10" aria-label="Defender Ships" required>
+        </label>
+        <label for="defenderTech">Weapons Tech:
+            <input type="number" id="defenderTech" placeholder="4" aria-label="Defender Weapons Tech" required>
+        </label>
+        <label for="productionRate">Star System Ship Production/hour:
+            <input type="number" id="productionRate" placeholder="5" aria-label="Ship Production Rate per Hour" required>
+        </label>
+        <label for="hours">Time before attacker arrives:
+            <input type="number" id="hours" placeholder="hrs" max="999" min="0" aria-label="Hours" required> :
+            <input type="number" id="minutes" placeholder="mins" max="59" min="0" aria-label="Minutes" required> :
+            <input type="number" id="seconds" placeholder="secs" max="59" min="0" aria-label="Seconds" required>
+        </label>
+    </fieldset>
+
+    <fieldset>
+        <legend>Attacker</legend>
+        <label for="attackerShips">Ships:
+            <input type="number" id="attackerShips" placeholder="10" aria-label="Attacker Ships" required>
+        </label>
+        <label for="attackerTech">Weapons Tech:
+            <input type="number" id="attackerTech" placeholder="6" aria-label="Attacker Weapons Tech" required>
+        </label>
+    </fieldset>
+
+    <div id="calculateContainer">
+        <div id="battleSummary"></div>
+        <button id="calculateBtn" onclick="calculateCombat()">
+            <i class="icon fas fa-calculator"></i>Calculate Combat
+        </button>
+        <button onclick="resetFields()">
+            <i class="icon fas fa-undo-alt"></i>Reset
+        </button>
+    </div>
+
+    <div id="combatLogModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleCombatLog()">&times;</span>
+            <pre id="combatLog"></pre>
+        </div>
+    </div>
+
+    <div id="combatLogContainer">
+        <button id="combatLogBtn" onclick="toggleCombatLog()">
+            <i class="icon fas fa-scroll"></i>Combat Log
+        </button>
+    </div>
+
+
+    <script>
+    function showBattleSummary(winner, shipsLeft) {
+        const battleSummary = document.getElementById('battleSummary');
+        if (winner === 'attacker') {
+            battleSummary.textContent = `Attacker won the battle with ${shipsLeft} ships left!`;
+        } else if (winner === 'defender') {
+            battleSummary.textContent = `Defender won the battle with ${shipsLeft} ships left!`;
+        } else {
+            battleSummary.textContent = 'The battle ended in a draw!';
+        }
+    }
+
+    function validateInputFields() {
+        const inputs = document.querySelectorAll('input[required]');
+        let isValid = true;
+
+        // Removing existing error messages
+        const errorElements = document.querySelectorAll('.error');
+        errorElements.forEach(error => error.remove());
+
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                isValid = false;
+                showErrorMessage(input);
+            }
+        });
+
+        return isValid;
+    }
+
+    function showErrorMessage(input) {
+        const errorElement = document.createElement('span');
+        errorElement.className = 'error';
+        errorElement.textContent = input.validationMessage;
+
+        input.insertAdjacentElement('afterend', errorElement);
+        setTimeout(() => {
+            errorElement.remove();
+        }, 3000);
+    }
+
+        function calculateCombat() {
+            const combatLogs = [];
+            const calculateBtn = document.getElementById('calculateBtn');
+
+            if (!validateInputFields()) {
+                return;
+            }
+
+            calculateBtn.disabled = true;
+            calculateBtn.textContent = 'Calculating...';
+
+            let defenderShips = parseInt(document.getElementById('defenderShips').value) || 0;
+            let defenderTech = (parseInt(document.getElementById('defenderTech').value) || 0) + 1;
+            let attackerShips = parseInt(document.getElementById('attackerShips').value) || 0;
+            let attackerTech = parseInt(document.getElementById('attackerTech').value) || 0;
+
+            let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
+            let hours = parseFloat(document.getElementById('hours').value) || 0;
+            let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
+            let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
+
+            let additionalShips = productionRate * (hours + minutes + seconds);
+            defenderShips += Math.floor(additionalShips);
+
+            let round = 1;
+    while (defenderShips > 0 && attackerShips > 0) {
+        combatLogs.push(`Round ${round}:`);
+        attackerShips -= defenderTech;
+        combatLogs.push(`Defender does ${defenderTech} damage. Attacker now has ${Math.max(attackerShips, 0)} ships.`);
+        if (attackerShips <= 0) break;
+
+        defenderShips -= attackerTech;
+        combatLogs.push(`Attacker does ${attackerTech} damage. Defender now has ${Math.max(defenderShips, 0)} ships.`);
+
+        round++;
+    }
+
+    document.getElementById('combatLog').innerText = combatLogs.join('\n');
+
+    calculateBtn.disabled = false;
+    calculateBtn.textContent = 'Calculate Combat';
+
+    // Updated: Determining the winner and ships left
+    let winner = '';
+    if (defenderShips <= 0 && attackerShips <= 0) {
+        winner = 'draw';
+    } else if (defenderShips > 0) {
+        winner = 'defender';
+    } else {
+        winner = 'attacker';
+    }
+
+    const shipsRemaining = (defenderShips > 0) ? defenderShips : attackerShips;
+    showBattleSummary(winner, shipsRemaining);
+}
+
+        function toggleCombatLog() {
+            const combatLogModal = document.getElementById('combatLogModal');
+            const combatLog = document.getElementById('combatLog');
+
+            if (combatLogModal.style.display === 'flex') {
+                combatLogModal.style.display = 'none';
+            } else {
+                combatLogModal.style.display = 'flex';
+                combatLog.scrollTop = combatLog.scrollHeight;
+            }
+        }
+
+        function resetFields() {
+            document.getElementById('defenderShips').value = '';
+            document.getElementById('defenderTech').value = '';
+            document.getElementById('attackerShips').value = '';
+            document.getElementById('attackerTech').value = '';
+            document.getElementById('productionRate').value = '';
+            document.getElementById('hours').value = '';
+            document.getElementById('minutes').value = '';
+            document.getElementById('seconds').value = '';
+            document.getElementById('combatLog').innerText = '';
+            document.getElementById('battleSummary').textContent = '';
+        }
+    </script>
+</body>
+
+</html>
