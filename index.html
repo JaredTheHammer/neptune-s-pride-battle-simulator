@@ -5,39 +5,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neptune's Pride Combat Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    :root {
-        --primary-bg-color: #262626;
-        --secondary-bg-color: #2c2c2c;
-        --text-color: #ddd;
-        --input-bg-color: #3a3a3a;
-        --border-color: #444;
-        --button-color: #007BFF;
-        --button-hover-color: #0056b3;
-    }
-        :root {
-            --primary-bg-color: #262626;
-            --secondary-bg-color: #2c2c2c;
-            --text-color: #ddd;
-            --input-bg-color: #3a3a3a;
-            --border-color: #444;
-            --button-color: #007BFF;
-            --button-hover-color: #0056b3;
-        }
+:root {
+    --primary-bg-color: #262626;
+    --secondary-bg-color: #2c2c2c;
+    --text-color: #ddd;
+    --input-bg-color: #3a3a3a;
+    --border-color: #444;
+    --button-color: #007BFF;
+    --button-hover-color: #0056b3;
+}
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--primary-bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
+/* Layout Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--primary-bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+}
+fieldset {
+    margin: 20px 0;
+    border: 2px solid var(--border-color);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 350px;
+    width: 100%;
+}
+#combatLogContainer {
+    text-align: center;
+    margin-top: 20px;
+}
 
+/* Typography Styles */
         h1 {
+            font-family: 'Orbitron', sans-serif;
             margin-bottom: 20px;
         }
 
@@ -62,23 +69,32 @@
             box-shadow: 0 0 3px var(--text-color);
         }
 
-        button {
-            margin: 10px 0;
-            padding: 10px 15px;
-            background-color: var(--button-color);
-            color: var(--text-color);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            display: flex;
-            align-items: center;
-        }
-
-        button:hover {
-            background-color: var(--button-hover-color);
-            transform: scale(1.05);
-        }
+/* Interactive Styles */
+button {
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+}
+button:hover {
+    background-color: var(--button-hover-color);
+    transform: scale(1.05);
+}
+.input-field {
+    padding: 8px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+}
 
         .icon {
             margin-right: 5px;
@@ -102,7 +118,6 @@
         }
 
         #combatLog {
-    display: none;
     margin-top: 20px;
 }
 
@@ -111,9 +126,6 @@
             margin-top: 20px;
         }
 
-        #combatLogBtn {
-            display: none; /* Hide this button as we are showing the combat log directly */
-        }
 
         #combatLogBtn:hover {
             background-color: var(--button-hover-color);
@@ -160,40 +172,71 @@
         }
 
         label {
-            position: relative;
-        }
+    position: relative;
+    display: block;
+    margin: 15px 0;
+    padding-left: 50px; /* Added to make space for the icon */
+}
 
-        label .fas {
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+label .fas {
+    position: absolute;
+    left: 18px; /* Adjust this value to your preference */
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 0px;
+    z-index: 1;
+}
+
+input {
+    padding: 8px;
+    padding-left: 8px; /* Adjust this value based on the icon's width */
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    width: 100%;
+    max-width: 300px;
+    position: relative;
+    z-index: 0;
+}
 
     </style>
 </head>
 
 <body>
-    <h1><i class="fas fa-space-shuttle"></i> Neptune's Pride Combat Calculator</h1>
+    <h1><i class="fas fa-solid fa-user-astronaut"></i> Neptune's Pride Combat Calculator</h1>
+    <h1><i class="fas fa-solid"></i></h1>
 
     <form id="combatForm">
-        <fieldset>
-            <legend><i class="fas fa-shield-alt"></i> Defender</legend>
-            <label for="defenderShips"><i class="fas fa-space-shuttle"></i> Ships:
-                <input type="number" id="defenderShips" placeholder="10" aria-label="Defender Ships" required>
-            </label>
-            <label for="defenderTech"><i class="fas fa-solid fa-radiation"></i> Weapons Tech:
-                <input type="number" id="defenderTech" placeholder="4" aria-label="Defender Weapons Tech" required>
-            </label>
-            <label for="productionRate"><i class="fas fa-solid fa-gears"></i> Star System Ship Production/hour:
-                <input type="number" id="productionRate" placeholder="5" aria-label="Ship Production Rate per Hour" required>
-            </label>
-            <label for="hours"><i class="fas fa-clock"></i> Time before attacker arrives:
-                <input type="number" id="hours" placeholder="hrs" max="999" min="0" aria-label="Hours" required> :
-                <input type="number" id="minutes" placeholder="mins" max="59" min="0" aria-label="Minutes" required> :
-                <input type="number" id="seconds" placeholder="secs" max="59" min="0" aria-label="Seconds" required>
-            </label>
-        </fieldset>
+    <fieldset>
+    <legend><i class="fas fa-shield-alt"></i> Defender</legend>
+    
+    <label for="defenderShips">
+        <i class="fas fa-space-shuttle"></i> 
+        Ships:
+        <input type="number" id="defenderShips" placeholder="10" aria-label="Defender Ships" required>
+    </label>
+    
+    <label for="defenderTech">
+        <i class="fas fa-solid fa-atom"></i> 
+        Weapons Tech:
+        <input type="number" id="defenderTech" placeholder="4" aria-label="Defender Weapons Tech" required>
+    </label>
+    
+    <label for="productionRate">
+        <i class="fas fa-solid fa-gears"></i> 
+        Star System Ship Production/hour:
+        <input type="number" id="productionRate" placeholder="5" aria-label="Ship Production Rate per Hour" required>
+    </label>
+    
+    <label for="hours">
+        <i class="fas fa-clock"></i> 
+        Time before attacker arrives:
+        <input type="number" id="hours" placeholder="hrs" max="999" min="0" aria-label="Hours" required> :
+        <input type="number" id="minutes" placeholder="mins" max="59" min="0" aria-label="Minutes" required> :
+        <input type="number" id="seconds" placeholder="secs" max="59" min="0" aria-label="Seconds" required>
+    </label>
+</fieldset>
 
         <fieldset>
             <legend><i class="fas fa-crosshairs"></i> Attacker</legend>
@@ -201,7 +244,7 @@
             Ships:
                 <input type="number" id="attackerShips" placeholder="10" aria-label="Attacker Ships" required>
             </label>
-            <label for="attackerTech"><i class="fas fa-solid fa-radiation"></i> Weapons Tech:
+            <label for="attackerTech"><i class="fas fa-solid fa-atom"></i> Weapons Tech:
                 <input type="number" id="attackerTech" placeholder="6" aria-label="Attacker Weapons Tech" required>
             </label>
         </fieldset>
@@ -214,9 +257,10 @@
             <button type="reset">
                 <i class="icon fas fa-undo-alt" aria-hidden="true"></i> Reset
             </button>
-            <button type="button" id="combatLogBtn">
-                <i class="icon fas fa-scroll" aria-hidden="true"></i> Show Combat Log
-            </button>
+            <button type="button" id="combatLogBtn" class="your-button-class">
+            <i class="fas fa-book"></i> Combat Log
+        </button>
+        
         </div>
 
         <div id="combatLogContainer">
@@ -226,87 +270,79 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const combatForm = document.getElementById('combatForm');
     const combatLog = document.getElementById('combatLog');
     const combatLogBtn = document.getElementById('combatLogBtn');
     const battleSummary = document.getElementById('battleSummary');
 
-    combatForm.addEventListener('submit', function (e) {
+    combatForm.addEventListener('submit', function(e) {
         e.preventDefault();
         calculateCombat();
     });
 
-    combatForm.addEventListener('reset', function () {
-        battleSummary.textContent = ''; // Clear the battle summary text on reset
-        combatLog.textContent = ''; // Clear the combat log text on reset
-        combatLogBtn.textContent = 'Show Combat Log'; // Reset the button text
-        combatLog.style.display = 'none'; // Hide the combat log
+    combatForm.addEventListener('reset', function() {
+        resetView();
     });
 
-    combatLogBtn.addEventListener('click', function () {
-    if (combatLog.style.display === 'none' || combatLog.style.display === '') {
-        combatLog.style.display = 'block';
-        combatLogBtn.textContent = 'Hide Combat Log';
-    } else {
-        combatLog.style.display = 'none';
-        combatLogBtn.textContent = 'Show Combat Log';
-    }
+    combatLogBtn.addEventListener('click', function() {
+    toggleCombatLog();
 });
 
     function calculateCombat() {
         const combatLogs = [];
-        const defenderShipsElem = document.getElementById('defenderShips');
-        const defenderTechElem = document.getElementById('defenderTech');
-        const attackerShipsElem = document.getElementById('attackerShips');
-        const attackerTechElem = document.getElementById('attackerTech');
-        const productionRateElem = document.getElementById('productionRate');
-        const hoursElem = document.getElementById('hours');
-        const minutesElem = document.getElementById('minutes');
-        const secondsElem = document.getElementById('seconds');
-
+        
         if (!validateInputFields()) return;
 
-        let defenderShips = parseInt(defenderShipsElem.value) || 0;
-        let defenderTech = (parseInt(defenderTechElem.value) || 0) + 1;
-        let attackerShips = parseInt(attackerShipsElem.value) || 0;
-        let attackerTech = parseInt(attackerTechElem.value) || 0;
+        let defenderStats = getCombatantStats('defender');
+        let attackerStats = getCombatantStats('attacker');
 
-        let productionRate = parseFloat(productionRateElem.value) || 0;
-        let hours = parseFloat(hoursElem.value) || 0;
-        let minutes = (parseFloat(minutesElem.value) || 0) / 60;
-        let seconds = (parseFloat(secondsElem.value) || 0) / 3600;
+        defenderStats.ships += calculateAdditionalShips();
 
-        let additionalShips = productionRate * (hours + minutes + seconds);
-        defenderShips += Math.floor(additionalShips);
+        const result = executeCombat(defenderStats, attackerStats, combatLogs);
 
+        combatLog.innerText = combatLogs.join('\n');
+        showBattleSummary(result.winner, result.shipsRemaining);
+    }
+
+    function getCombatantStats(type) {
+        return {
+            ships: parseInt(document.getElementById(`${type}Ships`).value) || 0,
+            tech: (parseInt(document.getElementById(`${type}Tech`).value) || 0) + 1
+        };
+    }
+
+    function calculateAdditionalShips() {
+        let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
+        let hours = parseFloat(document.getElementById('hours').value) || 0;
+        let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
+        let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
+
+        return Math.floor(productionRate * (hours + minutes + seconds));
+    }
+
+    function executeCombat(defender, attacker, combatLogs) {
         let round = 1;
-        while (defenderShips > 0 && attackerShips > 0) {
+        while (defender.ships > 0 && attacker.ships > 0) {
             combatLogs.push(`Round ${round}:`);
-            attackerShips -= defenderTech;
-            combatLogs.push(`Defender does ${defenderTech} damage. Attacker now has ${Math.max(attackerShips, 0)} ships.`);
-            if (attackerShips <= 0) break;
+            
+            attacker.ships -= defender.tech;
+            combatLogs.push(`Defender does ${defender.tech} damage. Attacker now has ${Math.max(attacker.ships, 0)} ships.`);
+            if (attacker.ships <= 0) break;
 
-            defenderShips -= attackerTech;
-            combatLogs.push(`Attacker does ${attackerTech} damage. Defender now has ${Math.max(defenderShips, 0)} ships.`);
-
+            defender.ships -= attacker.tech;
+            combatLogs.push(`Attacker does ${attacker.tech} damage. Defender now has ${Math.max(defender.ships, 0)} ships.`);
             round++;
         }
 
-        combatLog.innerText = combatLogs.join('\n');
-
-let winner = '';
-if (defenderShips <= 0 && attackerShips <= 0) {
-    winner = 'draw';
-} else if (defenderShips > 0) {
-    winner = 'defender';
-} else {
-    winner = 'attacker';
-}
-
-const shipsRemaining = (winner === 'defender') ? defenderShips : attackerShips;
-showBattleSummary(winner, shipsRemaining);
-}
+        if (defender.ships <= 0 && attacker.ships > 0) {
+            return { winner: 'attacker', shipsRemaining: attacker.ships };
+        } else if (attacker.ships <= 0 && defender.ships > 0) {
+            return { winner: 'defender', shipsRemaining: defender.ships };
+        } else {
+            return { winner: 'draw', shipsRemaining: 0 };
+        }
+    }
 
     function validateInputFields() {
         const inputs = document.querySelectorAll('input[required]');
@@ -316,7 +352,7 @@ showBattleSummary(winner, shipsRemaining);
         errorElements.forEach(error => error.remove());
 
         inputs.forEach(input => {
-            if (!input.checkValidity()) {
+            if (!input.checkValidity() || isNaN(input.value) || parseFloat(input.value) < 0) {
                 isValid = false;
                 showErrorMessage(input);
             }
@@ -328,7 +364,7 @@ showBattleSummary(winner, shipsRemaining);
     function showErrorMessage(input) {
         const errorElement = document.createElement('span');
         errorElement.className = 'error';
-        errorElement.textContent = input.validationMessage;
+        errorElement.textContent = input.validationMessage || "Invalid input.";
 
         input.insertAdjacentElement('afterend', errorElement);
         setTimeout(() => {
@@ -337,18 +373,35 @@ showBattleSummary(winner, shipsRemaining);
     }
 
     function showBattleSummary(winner, shipsLeft) {
-    let message = 'The battle ended in a draw!';
+        let message = 'The battle ended in a draw!';
+        
+        if (winner === 'attacker') {
+            message = `Attacker won the battle with ${shipsLeft} ships left!`;
+        } else if (winner === 'defender') {
+            message = `Defender won the battle with ${shipsLeft} ships left!`;
+        }
+        
+        battleSummary.textContent = message;
+    }
 
-    if (winner === 'attacker') {
-        message = `Attacker won the battle with ${shipsLeft} ships left!`;
-    } else if (winner === 'defender') {
-        message = `Defender won the battle with ${shipsLeft} ships left!`;
+    function resetView() {
+        battleSummary.textContent = '';
+        combatLog.textContent = '';
+        combatLogBtn.textContent = 'Show Combat Log';
+        combatLog.style.display = 'none';
     }
-    
-    battleSummary.textContent = message;
+
+    function toggleCombatLog() {
+    if (combatLog.style.display === 'none' || combatLog.style.display === '') {
+        combatLog.style.display = 'block';
+        combatLogBtn.innerHTML = '<i class="fas fa-book"></i> Hide Combat Log';
+    } else {
+        combatLog.style.display = 'none';
+        combatLogBtn.innerHTML = '<i class="fas fa-book"></i> Show Combat Log';
+    }
 }
-    }
 });
+
     </script>
 </body>
 
