@@ -70,6 +70,14 @@
             box-shadow: 0 0 3px var(--text-color);
         }
 
+        .attacker-color {
+            color: red;
+        }
+
+        .defender-color {
+            color: blue;
+        }
+
 /* Interactive Styles */
         button {
             margin: 10px 0;
@@ -282,7 +290,7 @@ Time Until Battle
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     const combatForm = document.getElementById('combatForm');
     const combatLog = document.getElementById('combatLog');
     const combatLogBtn = document.getElementById('combatLogBtn');
@@ -298,47 +306,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     combatLogBtn.addEventListener('click', function() {
-    toggleCombatLog();
-});
+        toggleCombatLog();
+    });
 
-function calculateCombat() {
-    const combatLogs = [];
-    let additionalShips = calculateAdditionalShips();
-    
-    combatLogs.push(`Defender will make ${additionalShips} additional ships.`);
+    function calculateCombat() {
+        const combatLogs = [];
+        let additionalShips = calculateAdditionalShips();
         
-    if (!validateInputFields()) return;
+        combatLogs.push(`Defender will make ${additionalShips} additional ships.`);
+            
+        if (!validateInputFields()) return;
 
-    let defenderStats = getCombatantStats('defender');
-    let attackerStats = getCombatantStats('attacker');
+        let defenderStats = getCombatantStats('defender');
+        let attackerStats = getCombatantStats('attacker');
 
-    defenderStats.ships += additionalShips;
+        defenderStats.ships += additionalShips;
 
-    combatLogs.push(`Total Defender ships before combat: ${defenderStats.ships}`);
-    combatLogs.push(`Total Attacker ships before combat: ${attackerStats.ships}`);
-    
-    const result = executeCombat(defenderStats, attackerStats, combatLogs);
+        combatLogs.push(`<span class="defender-color">Total Defender</span> ships before combat: <span class="defender-color">${defenderStats.ships}</span>`);
+        combatLogs.push(`<span class="attacker-color">Total Attacker</span> ships before combat: <span class="attacker-color">${attackerStats.ships}</span>`);
 
-    combatLog.innerText = combatLogs.join('\n');
-    showBattleSummary(result.winner, result.shipsRemaining);
-}
+        const result = executeCombat(defenderStats, attackerStats, combatLogs);
+
+        combatLog.innerHTML = combatLogs.join('<br>');
+        showBattleSummary(result.winner, result.shipsRemaining);
+    }
 
     function getCombatantStats(type) {
-    const techBonus = (type === 'defender') ? 1 : 0;
-    return {
-        ships: parseInt(document.getElementById(`${type}Ships`).value) || 0,
-        tech: (parseInt(document.getElementById(`${type}Tech`).value) || 0) + techBonus
-    };
-}
+        const techBonus = (type === 'defender') ? 1 : 0;
+        return {
+            ships: parseInt(document.getElementById(`${type}Ships`).value) || 0,
+            tech: (parseInt(document.getElementById(`${type}Tech`).value) || 0) + techBonus
+        };
+    }
 
-function calculateAdditionalShips() {
-    let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
-    let hours = parseFloat(document.getElementById('hours').value) || 0;
-    let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
-    let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
+    function calculateAdditionalShips() {
+        let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
+        let hours = parseFloat(document.getElementById('hours').value) || 0;
+        let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
+        let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
 
-    return Math.floor(productionRate * (hours + minutes + seconds));
-}
+        return Math.floor(productionRate * (hours + minutes + seconds));
+    }
 
     function executeCombat(defender, attacker, combatLogs) {
         let round = 1;
@@ -346,11 +354,11 @@ function calculateAdditionalShips() {
             combatLogs.push(`Round ${round}:`);
             
             attacker.ships -= defender.tech;
-            combatLogs.push(`Defender does ${defender.tech} damage. Attacker now has ${Math.max(attacker.ships, 0)} ships.`);
-            if (attacker.ships <= 0) break;
+            combatLogs.push(`<span class="defender-color">Defender</span> does ${defender.tech} damage. <span class="attacker-color">Attacker</span> now has <span class="attacker-color">${Math.max(attacker.ships, 0)}</span> ships.`);
 
             defender.ships -= attacker.tech;
-            combatLogs.push(`Attacker does ${attacker.tech} damage. Defender now has ${Math.max(defender.ships, 0)} ships.`);
+            combatLogs.push(`<span class="attacker-color">Attacker</span> does ${attacker.tech} damage. <span class="defender-color">Defender</span> now has <span class="defender-color">${Math.max(defender.ships, 0)}</span> ships.`);
+
             round++;
         }
 
@@ -386,41 +394,34 @@ function calculateAdditionalShips() {
         errorElement.textContent = input.validationMessage || "Invalid input.";
 
         input.insertAdjacentElement('afterend', errorElement);
-        setTimeout(() => {
-            errorElement.remove();
-        }, 3000);
-    }
-
-    function showBattleSummary(winner, shipsLeft) {
-        let message = 'The battle ended in a draw!';
-        
-        if (winner === 'attacker') {
-            message = `Attacker won the battle with ${shipsLeft} ships left!`;
-        } else if (winner === 'defender') {
-            message = `Defender won the battle with ${shipsLeft} ships left!`;
-        }
-        
-        battleSummary.textContent = message;
-    }
-
-    function resetView() {
-        battleSummary.textContent = '';
-        combatLog.textContent = '';
-        combatLogBtn.textContent = 'Show Combat Log';
-        combatLog.style.display = 'none';
     }
 
     function toggleCombatLog() {
-    if (combatLog.style.display === 'none' || combatLog.style.display === '') {
-        combatLog.style.display = 'block';
-        combatLogBtn.innerHTML = '<i class="fas fa-book"></i> Hide Combat Log';
-    } else {
-        combatLog.style.display = 'none';
-        combatLogBtn.innerHTML = '<i class="fas fa-book"></i> Show Combat Log';
+        if (combatLog.style.display === "none" || combatLog.style.display === "") {
+            combatLog.style.display = "block";
+        } else {
+            combatLog.style.display = "none";
+        }
     }
-}
-});
 
+    function resetView() {
+        battleSummary.innerHTML = "";
+        combatLog.innerHTML = "";
+    }
+
+    function showBattleSummary(winner, shipsRemaining) {
+        let summaryText = '';
+        if (winner === 'attacker') {
+            summaryText = `Attacker Wins with ${shipsRemaining} ships remaining.`;
+        } else if (winner === 'defender') {
+            summaryText = `Defender Wins with ${shipsRemaining} ships remaining.`;
+        } else {
+            summaryText = 'It\'s a draw!';
+        }
+
+        battleSummary.innerHTML = summaryText;
+    }
+});
     </script>
 </body>
 
