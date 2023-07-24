@@ -118,7 +118,8 @@ button:hover {
         }
 
         #combatLog {
-    margin-top: 20px;
+    margin-top: 200px;
+    overflow-y: auto;
 }
 
         #combatLogContainer {
@@ -151,7 +152,9 @@ button:hover {
                 padding: 10px;
             }
             fieldset {
-                max-width: 100%;
+                max-width: 280px;
+                margin: 10px 0;
+                padding: 10px;
             }
         }
 
@@ -181,7 +184,7 @@ button:hover {
 label .fas {
     position: absolute;
     left: 18px; /* Adjust this value to your preference */
-    top: 50%;
+    top: calc(50% - 0.5em);
     transform: translateY(-50%);
     padding: 0 0px;
     z-index: 1;
@@ -212,40 +215,40 @@ input {
     <legend><i class="fas fa-shield-alt"></i> Defender</legend>
     
     <label for="defenderShips">
-        <i class="fas fa-space-shuttle"></i> 
-        Ships:
-        <input type="number" id="defenderShips" placeholder="10" aria-label="Defender Ships" required>
-    </label>
+    <i class="fas fa-space-shuttle"></i> 
+    Ships
+    <input type="number" id="defenderShips" placeholder="Current Ships at Star" style="max-width: 250px;" aria-label="Defender Ships" required>
+</label>
     
     <label for="defenderTech">
         <i class="fas fa-solid fa-atom"></i> 
-        Weapons Tech:
-        <input type="number" id="defenderTech" placeholder="4" aria-label="Defender Weapons Tech" required>
+        Weapons Tech
+        <input type="number" id="defenderTech" placeholder="Defender's Level" aria-label="Defender Weapons Tech" required>
     </label>
     
     <label for="productionRate">
-        <i class="fas fa-solid fa-gears"></i> 
-        Star System Ship Production/hour:
-        <input type="number" id="productionRate" placeholder="5" aria-label="Ship Production Rate per Hour" required>
-    </label>
+    <i class="fas fa-solid fa-gears"></i> 
+    Star Ship Production Per Hour
+    <input type="number" step="0.01" id="productionRate" placeholder="Info Found at Star" aria-label="Ship Production Rate per Hour" required>
+</label>
     
-    <label for="hours">
-        <i class="fas fa-clock"></i> 
-        Time before attacker arrives:
-        <input type="number" id="hours" placeholder="hrs" max="999" min="0" aria-label="Hours" required> :
-        <input type="number" id="minutes" placeholder="mins" max="59" min="0" aria-label="Minutes" required> :
-        <input type="number" id="seconds" placeholder="secs" max="59" min="0" aria-label="Seconds" required>
-    </label>
+<label for="hours">
+<i class="fas fa-clock"></i> 
+Time Until Battle
+<input type="number" id="hours" placeholder="Hours" max="999" min="0" aria-label="Hours" required value="0">
+<input type="number" id="minutes" placeholder="Minutes" max="59" min="0" aria-label="Minutes" required value="0">
+<input type="number" id="seconds" placeholder="Seconds" max="59" min="0" aria-label="Seconds" required value="0">
+</label>
 </fieldset>
 
         <fieldset>
             <legend><i class="fas fa-crosshairs"></i> Attacker</legend>
             <label for="attackerShips"><i class="fas fa-space-shuttle"></i>
-            Ships:
-                <input type="number" id="attackerShips" placeholder="10" aria-label="Attacker Ships" required>
+            Ships
+                <input type="number" id="attackerShips" placeholder="Ships Inbound" aria-label="Attacker Ships" required>
             </label>
-            <label for="attackerTech"><i class="fas fa-solid fa-atom"></i> Weapons Tech:
-                <input type="number" id="attackerTech" placeholder="6" aria-label="Attacker Weapons Tech" required>
+            <label for="attackerTech"><i class="fas fa-solid fa-atom"></i> Weapons Tech
+                <input type="number" id="attackerTech" placeholder="Attacker's Level" aria-label="Attacker Weapons Tech" required>
             </label>
         </fieldset>
 
@@ -306,20 +309,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getCombatantStats(type) {
-        return {
-            ships: parseInt(document.getElementById(`${type}Ships`).value) || 0,
-            tech: (parseInt(document.getElementById(`${type}Tech`).value) || 0) + 1
-        };
-    }
+    const techBonus = (type === 'defender') ? 1 : 0;
+    return {
+        ships: parseInt(document.getElementById(`${type}Ships`).value) || 0,
+        tech: (parseInt(document.getElementById(`${type}Tech`).value) || 0) + techBonus
+    };
+}
+function calculateAdditionalShips() {
+    let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
+    let hours = parseFloat(document.getElementById('hours').value) || 0;
+    let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
+    let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
 
-    function calculateAdditionalShips() {
-        let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
-        let hours = parseFloat(document.getElementById('hours').value) || 0;
-        let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
-        let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
-
-        return Math.floor(productionRate * (hours + minutes + seconds));
-    }
+    return Math.floor(productionRate * (hours + minutes + seconds));
+}
 
     function executeCombat(defender, attacker, combatLogs) {
         let round = 1;
