@@ -114,7 +114,6 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 9999;
-            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -204,6 +203,7 @@
 <body>
     <h1>Neptune's Pride Combat Calculator</h1>
 
+    <form id="combatForm">
     <fieldset>
         <legend>Defender</legend>
         <label for="defenderShips">Ships:
@@ -233,38 +233,117 @@
     </fieldset>
 
     <div id="calculateContainer">
-        <div id="battleSummary"></div>
-        <button id="calculateBtn" onclick="calculateCombat()">
-            <i class="icon fas fa-calculator"></i>Calculate Combat
-        </button>
-        <button onclick="resetFields()">
-            <i class="icon fas fa-undo-alt"></i>Reset
-        </button>
-    </div>
+    <div id="battleSummary"></div>
+    <button type="submit">
+        <i class="icon fas fa-calculator" aria-hidden="true"></i>Calculate Combat
+    </button>
+    <button type="reset">
+        <i class="icon fas fa-undo-alt" aria-hidden="true"></i>Reset
+    </button>
+</div>
+</form>
 
-    <div id="combatLogModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleCombatLog()">&times;</span>
-            <pre id="combatLog"></pre>
-        </div>
-    </div>
+<div id="combatLogModal">
+<div class="modal-content" tabindex="-1">
+    <span class="close-modal" tabindex="0" role="button" aria-label="Close modal">&times;</span>
+    <pre id="combatLog"></pre>
+</div>
+</div>
 
-    <div id="combatLogContainer">
-        <button id="combatLogBtn" onclick="toggleCombatLog()">
-            <i class="icon fas fa-scroll"></i>Combat Log
-        </button>
-    </div>
+<div id="combatLogContainer">
+<button id="combatLogBtn">
+    <i class="icon fas fa-scroll" aria-hidden="true"></i>Combat Log
+</button>
+</div>
 
 
     <script>
-    function showBattleSummary(winner, shipsLeft) {
-        const battleSummary = document.getElementById('battleSummary');
-        if (winner === 'attacker') {
-            battleSummary.textContent = `Attacker won the battle with ${shipsLeft} ships left!`;
-        } else if (winner === 'defender') {
-            battleSummary.textContent = `Defender won the battle with ${shipsLeft} ships left!`;
+document.addEventListener('DOMContentLoaded', function () {
+    const combatForm = document.getElementById('combatForm');
+    const combatLogModal = document.getElementById('combatLogModal');
+    const combatLog = document.getElementById('combatLog');
+    const combatLogBtn = document.getElementById('combatLogBtn');
+    const closeModalElement = document.querySelector('.close-modal');
+    const battleSummary = document.getElementById('battleSummary');
+
+    combatForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        calculateCombat();
+    });
+
+    combatForm.addEventListener('reset', function () {
+        battleSummary.textContent = ''; // Clear the battle summary text on reset
+    });
+
+    combatLogBtn.addEventListener('click', toggleCombatLog);
+
+    closeModalElement.addEventListener('click', toggleCombatLog);
+    closeModalElement.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            toggleCombatLog();
+        }
+    });
+
+    function calculateCombat() {
+        const combatLogs = [];
+        const defenderShipsElem = document.getElementById('defenderShips');
+        const defenderTechElem = document.getElementById('defenderTech');
+        const attackerShipsElem = document.getElementById('attackerShips');
+        const attackerTechElem = document.getElementById('attackerTech');
+        const productionRateElem = document.getElementById('productionRate');
+        const hoursElem = document.getElementById('hours');
+        const minutesElem = document.getElementById('minutes');
+        const secondsElem = document.getElementById('seconds');
+
+        if (!validateInputFields()) return;
+
+        let defenderShips = parseInt(defenderShipsElem.value) || 0;
+        let defenderTech = (parseInt(defenderTechElem.value) || 0) + 1;
+        let attackerShips = parseInt(attackerShipsElem.value) || 0;
+        let attackerTech = parseInt(attackerTechElem.value) || 0;
+
+        let productionRate = parseFloat(productionRateElem.value) || 0;
+        let hours = parseFloat(hoursElem.value) || 0;
+        let minutes = (parseFloat(minutesElem.value) || 0) / 60;
+        let seconds = (parseFloat(secondsElem.value) || 0) / 3600;
+
+        let additionalShips = productionRate * (hours + minutes + seconds);
+        defenderShips += Math.floor(additionalShips);
+
+        let round = 1;
+        while (defenderShips > 0 && attackerShips > 0) {
+            combatLogs.push(`Round ${round}:`);
+            attackerShips -= defenderTech;
+            combatLogs.push(`Defender does ${defenderTech} damage. Attacker now has ${Math.max(attackerShips, 0)} ships.`);
+            if (attackerShips <= 0) break;
+
+            defenderShips -= attackerTech;
+            combatLogs.push(`Attacker does ${attackerTech} damage. Defender now has ${Math.max(defenderShips, 0)} ships.`);
+
+            round++;
+        }
+
+        combatLog.innerText = combatLogs.join('\n');
+        
+        let winner = '';
+        if (defenderShips <= 0 && attackerShips <= 0) {
+            winner = 'draw';
+        } else if (defenderShips > 0) {
+            winner = 'defender';
         } else {
-            battleSummary.textContent = 'The battle ended in a draw!';
+            winner = 'attacker';
+        }
+        
+        const shipsRemaining = (winner === 'defender') ? defenderShips : attackerShips;
+        showBattleSummary(winner, shipsRemaining);
+    }
+
+    function toggleCombatLog() {
+        if (combatLogModal.style.display === 'flex') {
+            combatLogModal.style.display = 'none';
+        } else {
+            combatLogModal.style.display = 'flex';
+            combatLog.scrollTop = combatLog.scrollHeight;
         }
     }
 
@@ -272,7 +351,6 @@
         const inputs = document.querySelectorAll('input[required]');
         let isValid = true;
 
-        // Removing existing error messages
         const errorElements = document.querySelectorAll('.error');
         errorElements.forEach(error => error.remove());
 
@@ -297,86 +375,16 @@
         }, 3000);
     }
 
-        function calculateCombat() {
-            const combatLogs = [];
-            const calculateBtn = document.getElementById('calculateBtn');
-
-            if (!validateInputFields()) {
-                return;
-            }
-
-            calculateBtn.disabled = true;
-            calculateBtn.textContent = 'Calculating...';
-
-            let defenderShips = parseInt(document.getElementById('defenderShips').value) || 0;
-            let defenderTech = (parseInt(document.getElementById('defenderTech').value) || 0) + 1;
-            let attackerShips = parseInt(document.getElementById('attackerShips').value) || 0;
-            let attackerTech = parseInt(document.getElementById('attackerTech').value) || 0;
-
-            let productionRate = parseFloat(document.getElementById('productionRate').value) || 0;
-            let hours = parseFloat(document.getElementById('hours').value) || 0;
-            let minutes = (parseFloat(document.getElementById('minutes').value) || 0) / 60;
-            let seconds = (parseFloat(document.getElementById('seconds').value) || 0) / 3600;
-
-            let additionalShips = productionRate * (hours + minutes + seconds);
-            defenderShips += Math.floor(additionalShips);
-
-            let round = 1;
-    while (defenderShips > 0 && attackerShips > 0) {
-        combatLogs.push(`Round ${round}:`);
-        attackerShips -= defenderTech;
-        combatLogs.push(`Defender does ${defenderTech} damage. Attacker now has ${Math.max(attackerShips, 0)} ships.`);
-        if (attackerShips <= 0) break;
-
-        defenderShips -= attackerTech;
-        combatLogs.push(`Attacker does ${attackerTech} damage. Defender now has ${Math.max(defenderShips, 0)} ships.`);
-
-        round++;
-    }
-
-    document.getElementById('combatLog').innerText = combatLogs.join('\n');
-
-    calculateBtn.disabled = false;
-    calculateBtn.textContent = 'Calculate Combat';
-
-    // Updated: Determining the winner and ships left
-    let winner = '';
-    if (defenderShips <= 0 && attackerShips <= 0) {
-        winner = 'draw';
-    } else if (defenderShips > 0) {
-        winner = 'defender';
-    } else {
-        winner = 'attacker';
-    }
-
-    const shipsRemaining = (defenderShips > 0) ? defenderShips : attackerShips;
-    showBattleSummary(winner, shipsRemaining);
-}
-
-        function toggleCombatLog() {
-            const combatLogModal = document.getElementById('combatLogModal');
-            const combatLog = document.getElementById('combatLog');
-
-            if (combatLogModal.style.display === 'flex') {
-                combatLogModal.style.display = 'none';
-            } else {
-                combatLogModal.style.display = 'flex';
-                combatLog.scrollTop = combatLog.scrollHeight;
-            }
+    function showBattleSummary(winner, shipsLeft) {
+        if (winner === 'attacker') {
+            battleSummary.textContent = `Attacker won the battle with ${shipsLeft} ships left!`;
+        } else if (winner === 'defender') {
+            battleSummary.textContent = `Defender won the battle with ${shipsLeft} ships left!`;
+        } else {
+            battleSummary.textContent = 'The battle ended in a draw!';
         }
-
-        function resetFields() {
-            document.getElementById('defenderShips').value = '';
-            document.getElementById('defenderTech').value = '';
-            document.getElementById('attackerShips').value = '';
-            document.getElementById('attackerTech').value = '';
-            document.getElementById('productionRate').value = '';
-            document.getElementById('hours').value = '';
-            document.getElementById('minutes').value = '';
-            document.getElementById('seconds').value = '';
-            document.getElementById('combatLog').innerText = '';
-            document.getElementById('battleSummary').textContent = '';
-        }
+    }
+});
     </script>
 </body>
 
